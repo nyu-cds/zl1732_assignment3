@@ -51,10 +51,10 @@ def advance(dict_local, Local_keys,dt,i):
     '''
         advance the system one timestep
     '''
-        # Add the pairs in main function as a local variable instead of add them in each function
-
+    # move pairs out of the loop
+    pairs = it.combinations(Local_keys, 2)
     for _ in range(i):
-        pairs = it.combinations(dict_local.keys(), 2)
+        #pairs = it.combinations(Local_keys, 2)
         for pair in pairs:
             ((x1, y1, z1), v1, m1) = dict_local[pair[0]]
             ((x2, y2, z2), v2, m2) = dict_local[pair[1]]
@@ -62,12 +62,17 @@ def advance(dict_local, Local_keys,dt,i):
             dy = y1-y2
             dz = z1-z2
             mag = dt * ((dx * dx + dy * dy + dz * dz) ** (-1.5))
-            v1[0] -= dx * m2 * mag
-            v1[1] -= dy * m2 * mag
-            v1[2] -= dz * m2 * mag
-            v2[0] += dx * m1 * mag
-            v2[1] += dy * m1 * mag
-            v2[2] += dz * m1 * mag
+            ################
+            # add temp var #
+            ################
+            temp1 = m1*mag
+            temp2 = m2*mag
+            v1[0] -= dx * temp2
+            v1[1] -= dy * temp2
+            v1[2] -= dz * temp2
+            v2[0] += dx * temp1
+            v2[1] += dy * temp1
+            v2[2] += dz * temp1
 
         for body in Local_keys:
             (r, [vx, vy, vz], m) = dict_local[body]
@@ -91,7 +96,7 @@ def report_energy(dict_local, Local_keys,e=0.0):
         e -= (m1 * m2) / ((dx * dx + dy * dy + dz * dz) ** 0.5)
         
     for body in Local_keys:
-        (r, [vx, vy, vz], m) = BODIES[body]
+        (r, [vx, vy, vz], m) = dict_local[body]
         e += m * (vx * vx + vy * vy + vz * vz) / 2.
         
     return e
