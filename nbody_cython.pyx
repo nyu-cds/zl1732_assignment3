@@ -1,8 +1,11 @@
 
 """
     N-body simulation.
-    In this version, combined all the improvement together. R = 3.3728424910910206
+    In this version, combined all the improvement together.
+    before: 46s
+    after: 10s
 """
+
 from timeit import timeit
 import itertools as it
 cdef float PI = 3.14159265358979323
