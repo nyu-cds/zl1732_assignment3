@@ -1,14 +1,15 @@
+
 """
     N-body simulation.
     In this version, combined all the improvement together. R = 3.3728424910910206
 """
 from timeit import timeit
 import itertools as it
-PI = 3.14159265358979323
-SOLAR_MASS = 4 * PI * PI
-DAYS_PER_YEAR = 365.24
+cdef float PI = 3.14159265358979323
+cdef float SOLAR_MASS = 4 * PI * PI
+cdef float DAYS_PER_YEAR = 365.24
 
-BODIES = {
+cdef dict BODIES = {
     'sun': ([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], SOLAR_MASS),
 
     'jupiter': ([4.84143144246472090e+00,
@@ -48,14 +49,18 @@ BODIES = {
 
 
 # add inputs to avoid create local variable many times.
-def advance(dict_local, Local_keys,dt,i):
+cpdef void advance(dict_local, Local_keys,dt,i):
     '''
         advance the system one timestep
     '''
     # move pairs out of the loop
     pairs = list(it.combinations(Local_keys, 2))
+    
+    # def float
+    cdef float x1, x2, y1, y2, z1, z2, m1, m2, dx, dy, dz, mag, temp1, temp2, vx, vy, vz, m
+    cdef list v1, v2, r
+    
     for _ in range(i):
-        #pairs = it.combinations(Local_keys, 2)
         for pair in pairs:
             ((x1, y1, z1), v1, m1) = dict_local[pair[0]]
             ((x2, y2, z2), v2, m2) = dict_local[pair[1]]
@@ -82,12 +87,16 @@ def advance(dict_local, Local_keys,dt,i):
             r[2] += dt * vz
 
 
-def report_energy(dict_local, Local_keys,e=0.0):
+cpdef float report_energy(dict_local, Local_keys,e=0.0):
     '''
         compute the energy and return it so that it can be printed
     '''
     # Add the pairs in main function as a local variable instead of add them in each function
     pairs = it.combinations(dict_local.keys(), 2)
+    
+    # def float
+    cdef float dx, dy, dz
+    
     for pair in pairs:
         ((x1, y1, z1), v1, m1) = dict_local[pair[0]]
         ((x2, y2, z2), v2, m2) = dict_local[pair[1]]
@@ -103,15 +112,11 @@ def report_energy(dict_local, Local_keys,e=0.0):
     return e
 
 # add an input that take local_keys
-def offset_momentum(dict_local, Local_keys, ref, px=0.0, py=0.0, pz=0.0):
+cpdef void offset_momentum(dict_local, Local_keys, ref, px=0.0, py=0.0, pz=0.0):
     '''
         ref is the body in the center of the system
         offset values from this reference
     '''
-        # Add the pairs in main function as a local variable instead of add them in each function
-    #import itertools as it
-
-    
     for body in Local_keys:
         (r, [vx, vy, vz], m) = dict_local[body]
         px -= vx * m
@@ -124,7 +129,7 @@ def offset_momentum(dict_local, Local_keys, ref, px=0.0, py=0.0, pz=0.0):
     v[2] = pz / m
 
 
-def nbody(loops, reference, iterations):
+cpdef void nbody(loops, reference, iterations):
     '''
         nbody simulation
         loops - number of loops to run
@@ -137,8 +142,6 @@ def nbody(loops, reference, iterations):
     
     # Set up global state
     offset_momentum(dict_local, Local_keys,dict_local[reference])
-    
-
 
     for _ in range(loops):
         report_energy(dict_local, Local_keys)

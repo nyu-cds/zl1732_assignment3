@@ -1,20 +1,68 @@
 """
-    N-body simulation.
-    In this version, combined all the improvement together. R = 3.3728424910910206
-    =============================================================================
-    Assignment 5
-    =============================================================================
-    1, change the import method to "from itertools import combinations", only import
-    the package that is used.
-    
-    2, Define a function creat() that creat the BODIES instead of make a copy of it.
-    
-    3, create local variable of pairs in main function instead of create it in each
-    function.
-    
-    4, update nboby in main function.
-"""
+         2208 function calls in 39.124 seconds
 
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      100   39.102    0.391   39.102    0.391 nbody_iter.py:68(advance)
+      100    0.012    0.000    0.012    0.000 {method 'send' of '_socket.socket' objects}
+      200    0.002    0.000    0.018    0.000 iostream.py:309(write)
+      100    0.002    0.000    0.020    0.000 {built-in method builtins.print}
+      100    0.001    0.000    0.015    0.000 ioloop.py:932(add_callback)
+      100    0.001    0.000    0.001    0.000 nbody_iter.py:99(report_energy)
+      200    0.001    0.000    0.016    0.000 iostream.py:241(_schedule_flush)
+        1    0.001    0.001   39.124   39.124 nbody_iter.py:136(nbody)
+      100    0.001    0.000    0.001    0.000 stack_context.py:253(wrap)
+      100    0.000    0.000    0.000    0.000 {built-in method builtins.hasattr}
+      200    0.000    0.000    0.001    0.000 iostream.py:228(_is_master_process)
+      100    0.000    0.000    0.012    0.000 common.py:75(wake)
+      200    0.000    0.000    0.000    0.000 {method 'write' of '_io.StringIO' objects}
+      200    0.000    0.000    0.000    0.000 {built-in method nt.getpid}
+      200    0.000    0.000    0.000    0.000 {built-in method builtins.isinstance}
+        1    0.000    0.000   39.124   39.124 {built-in method builtins.exec}
+      100    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
+      100    0.000    0.000    0.000    0.000 {built-in method _thread.get_ident}
+        1    0.000    0.000   39.124   39.124 <string>:1(<module>)
+        1    0.000    0.000    0.000    0.000 nbody_iter.py:25(create)
+        1    0.000    0.000    0.000    0.000 nbody_iter.py:118(offset_momentum)
+        2    0.000    0.000    0.000    0.000 {method 'keys' of 'dict' objects}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+        
+        
+        
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    53                                           def advance(dict_local, Local_keys, pairs,dt,i):
+    54                                               '''
+    55                                                   advance the system one timestep
+    56                                               '''
+    57    100005       213826      2.1      0.5      for _ in range(i):
+    58   1100000      2227571      2.0      5.3          for pair in pairs:
+    59   1000000      2337722      2.3      5.6              ((x1, y1, z1), v1, m1) = dict_local[pair[0]]
+    60   1000000      2291839      2.3      5.5              ((x2, y2, z2), v2, m2) = dict_local[pair[1]]
+    61   1000000      2040544      2.0      4.9              dx = x1-x2
+    62   1000000      1986708      2.0      4.8              dy = y1-y2
+    63   1000000      1983802      2.0      4.8              dz = z1-z2
+    64   1000000      3363218      3.4      8.1              mag = dt * ((dx * dx + dy * dy + dz * dz) ** (-1.5))
+    65                                                       ################
+    66                                                       # add temp var #
+    67                                                       ################
+    68   1000000      2124555      2.1      5.1              temp1 = m1*mag
+    69   1000000      2030174      2.0      4.9              temp2 = m2*mag
+    70   1000000      2489374      2.5      6.0              v1[0] -= dx * temp2
+    71   1000000      2520447      2.5      6.0              v1[1] -= dy * temp2
+    72   1000000      2462499      2.5      5.9              v1[2] -= dz * temp2
+    73   1000000      2535931      2.5      6.1              v2[0] += dx * temp1
+    74   1000000      2495434      2.5      6.0              v2[1] += dy * temp1
+    75   1000000      2407855      2.4      5.8              v2[2] += dz * temp1
+    76                                           
+    77    600000      1289095      2.1      3.1          for body in Local_keys:
+    78    500000      1138239      2.3      2.7              (r, [vx, vy, vz], m) = dict_local[body]
+    79    500000      1234132      2.5      3.0              r[0] += dt * vx
+    80    500000      1243206      2.5      3.0              r[1] += dt * vy
+    81    500000      1247988      2.5      3.0              r[2] += dt * vz
+"""
+# we can see that most of the time are spend in advance function
 
 from itertools import combinations
 from timeit import timeit
