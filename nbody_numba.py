@@ -79,13 +79,11 @@ def advance(pairs, dict_local, Local_keys,dt,i):
             r[2] += dt * vz
 
             
-@jit('float64(float64[:,:,:], char[:], float64)') 
-def report_energy(dict_local, Local_keys,e=0.0):
+@jit('float64(char[:,:], float64[:,:,:], char[:], float64)') 
+def report_energy(pairs, dict_local, Local_keys,e=0.0):
     '''
         compute the energy and return it so that it can be printed
     '''
-    # Add the pairs in main function as a local variable instead of add them in each function
-    pairs = it.combinations(dict_local.keys(), 2)
     for pair in pairs:
         (vector1, v1, m1) = dict_local[pair[0]]
         (vector2, v2, m2) = dict_local[pair[1]]
@@ -143,7 +141,7 @@ def nbody(loops, reference, iterations):
 
     for _ in range(loops):
         advance(pairs, dict_local, Local_keys,0.01,i=iterations)
-        print(report_energy(dict_local, Local_keys))
+        print(report_energy(pairs, dict_local, Local_keys))
 
 if __name__ == '__main__':
     print(timeit(lambda:nbody(100, 'sun', 20000),number=1))
